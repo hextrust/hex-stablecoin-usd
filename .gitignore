@@ -1,0 +1,23 @@
+# compiled output
+/node_modules
+/cache
+/artifacts
+/typechain-types
+/contracts-exposed
+/coverage
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Readme file
+README.md
+
+.DS_Store
+**/.DS_Store
+
+.env
+

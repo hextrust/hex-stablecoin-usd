@@ -1,0 +1,43 @@
+{
+  "name": "hex-stablecoin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "npx hardhat run scripts/deploy.ts --network localhost",
+    "query": "npx hardhat run scripts/query.ts --network localhost",
+    "upgrade": "npx hardhat run scripts/upgrade.ts --network localhost",
+    "compile": "yarn hardhat compile",
+    "test": "yarn hardhat test",
+    "coverage": "yarn hardhat coverage"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^1.24.0",
+    "@openzeppelin/test-helpers": "^0.5.16",
+    "hardhat": "^2.18.3"
+  },
+  "devDependencies": {
+    "@ethersproject/abi": "^5.4.7",
+    "@ethersproject/providers": "^5.4.7",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-etherscan": "^3.1.7",
+    "@nomiclabs/hardhat-truffle5": "^2.0.7",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.2",
+    "chai": "^4.2.0",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.4.7",
+    "hardhat-exposed": "^0.3.12",
+    "hardhat-gas-reporter": "^1.0.8",
+    "solidity-coverage": "^0.8.5",
+    "typechain": "^8.1.0",
+    "typescript": "^5.3.3",
+    "web3": "^1.10.2"
+  }
+}
