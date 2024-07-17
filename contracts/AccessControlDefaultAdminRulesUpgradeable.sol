@@ -73,6 +73,28 @@ abstract contract AccessControlDefaultAdminRulesUpgradeable is
     }
 
     /**
+     * @dev Throws if called by any account other than the _currentDefaultAdmin.
+     */
+    modifier onlyDefaultAdmin() {
+        require(isDefaultAdmin(), "AccessControl: caller is not the default admin");
+        _;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the _currentDefaultAdmin or with given role
+     */
+    modifier onlyRoleOrDefaultAdmin(bytes32 role) {
+        if (!isDefaultAdmin()) {
+            _checkRole(role);
+        }
+        _;
+    }
+
+    function isDefaultAdmin() public view virtual returns (bool) {
+        return defaultAdmin() == _msgSender();
+    }
+
+    /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(
