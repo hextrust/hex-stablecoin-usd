@@ -108,12 +108,14 @@ abstract contract OFTCoreUpgradeable is
 
     /**
      * @dev Sets the message inspector address for the OFT.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @param _msgInspector The address of the message inspector.
      *
      * @dev This is an optional contract that can be used to inspect both 'message' and 'options'.
      * @dev Set it to address(0) to disable it, or set it to a contract address to enable it.
      */
-    function setMsgInspector(address _msgInspector) public virtual onlyOwner {
+    function setMsgInspector(address _msgInspector) public virtual {
+        _checkAuthorizeOperator();
         OFTCoreStorage storage $ = _getOFTCoreStorage();
         $.msgInspector = _msgInspector;
         emit MsgInspectorSet(_msgInspector);

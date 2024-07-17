@@ -2,15 +2,16 @@
 
 pragma solidity ^0.8.20;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IPreCrime } from "./interfaces/IPreCrime.sol";
 import { IOAppPreCrimeSimulator, InboundPacket, Origin } from "./interfaces/IOAppPreCrimeSimulator.sol";
+import {OAuth} from "../auth/OAuth.sol";
 
 /**
  * @title OAppPreCrimeSimulator
  * @dev Abstract contract serving as the base for preCrime simulation functionality in an OApp.
  */
-abstract contract OAppPreCrimeSimulatorUpgradeable is IOAppPreCrimeSimulator, OwnableUpgradeable {
+abstract contract OAppPreCrimeSimulatorUpgradeable is IOAppPreCrimeSimulator, OAuth, Initializable {
     struct OAppPreCrimeSimulatorStorage {
         // The address of the preCrime implementation.
         address preCrime;
@@ -52,9 +53,11 @@ abstract contract OAppPreCrimeSimulatorUpgradeable is IOAppPreCrimeSimulator, Ow
 
     /**
      * @dev Sets the preCrime contract address.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @param _preCrime The address of the preCrime contract.
      */
-    function setPreCrime(address _preCrime) public virtual onlyOwner {
+    function setPreCrime(address _preCrime) public virtual {
+        _checkAuthorizeOperator();
         OAppPreCrimeSimulatorStorage storage $ = _getOAppPreCrimeSimulatorStorage();
         $.preCrime = _preCrime;
         emit PreCrimeSet(_preCrime);
