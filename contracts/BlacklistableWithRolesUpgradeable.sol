@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
 import {PausableWithRolesUpgradeable} from "contracts/PausableWithRolesUpgradeable.sol";
 import {Context} from "contracts/utils/Context.sol";
