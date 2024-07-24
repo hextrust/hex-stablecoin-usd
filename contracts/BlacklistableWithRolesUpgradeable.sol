@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {PausableWithRolesUpgradeable} from "contracts/PausableWithRolesUpgradeable.sol";
+import {AccessControlDefaultAdminRulesUpgradeable} from "contracts/AccessControlDefaultAdminRulesUpgradeable.sol";
 import {Context} from "contracts/utils/Context.sol";
 import {RoleConstant} from "contracts/utils/RoleConstant.sol";
 
@@ -11,7 +11,8 @@ import {RoleConstant} from "contracts/utils/RoleConstant.sol";
  */
 
 abstract contract BlacklistableWithRolesUpgradeable is
-    PausableWithRolesUpgradeable
+    Context,
+    AccessControlDefaultAdminRulesUpgradeable
 {
     /// @custom:storage-location erc7201:BlacklistableStorage
     struct BlacklistableStorage {
@@ -51,10 +52,10 @@ abstract contract BlacklistableWithRolesUpgradeable is
     }
 
     /**
-     * @dev Modifier to prevent blacklisting the owner and BLACKLISTER_ROLE
+     * @dev Modifier to prevent blacklisting the defaultAdmin/owner and BLACKLISTER_ROLE
      */
-    modifier notBlacklistMember(address addr) {
-        if (addr == owner()) revert BlacklistNotAllowed();
+    modifier notBlacklisterRole(address addr) {
+        if (addr == defaultAdmin()) revert BlacklistNotAllowed();
         if (hasRole(RoleConstant.BLACKLISTER_ROLE, addr))
             revert BlacklistNotAllowed();
         _;
@@ -114,7 +115,6 @@ abstract contract BlacklistableWithRolesUpgradeable is
         onlyRole(RoleConstant.BLACKLISTER_ROLE)
         nonZA(user)
         whenBlacklisted(user)
-        whenNotPaused
     {
         BlacklistableStorage storage $ = _getBlacklistableStorageLocation();
         $.blacklisted[user] = false;
@@ -133,8 +133,7 @@ abstract contract BlacklistableWithRolesUpgradeable is
         nonZA(user)
         whenNotBlacklisted(user)
         notBlacklistThisContract(user)
-        notBlacklistMember(user)
-        whenNotPaused
+        notBlacklisterRole(user)
     {
         BlacklistableStorage storage $ = _getBlacklistableStorageLocation();
         $.blacklisted[user] = true;

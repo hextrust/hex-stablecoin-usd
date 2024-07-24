@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {BlacklistableWithRolesUpgradeable} from "contracts/BlacklistableWithRolesUpgradeable.sol";
+import {PausableWithRolesUpgradeable} from "contracts/PausableWithRolesUpgradeable.sol";
 import {RoleConstant} from "contracts/utils/RoleConstant.sol";
 
 /**
@@ -12,6 +13,7 @@ import {RoleConstant} from "contracts/utils/RoleConstant.sol";
 
 abstract contract ERC20WithRolesUpgradeable is
     ERC20Upgradeable,
+    PausableWithRolesUpgradeable,
     BlacklistableWithRolesUpgradeable
 {
     /// @custom:storage-location erc7201:ERC20PermitWithRolesStorage

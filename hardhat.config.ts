@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 import "@nomicfoundation/hardhat-toolbox";
 import '@openzeppelin/hardhat-upgrades';
 import { HardhatUserConfig } from 'hardhat/types';
-import './tasks/createToken';
 import "@nomiclabs/hardhat-truffle5";
 import 'hardhat-exposed';
 import 'solidity-coverage'
@@ -10,7 +9,18 @@ import 'solidity-coverage'
 dotenv.config()
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.23",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 2000,
+        details: {
+          yul: true,
+        }
+      },
+    },
+  },
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true

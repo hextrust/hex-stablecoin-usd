@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "clear": "rm -rf cache contracts-exposed artifacts typechain-types node_modules coverage",
     "deploy": "npx hardhat run scripts/deploy.ts --network localhost",
     "query": "npx hardhat run scripts/query.ts --network localhost",
     "upgrade": "npx hardhat run scripts/upgrade.ts --network localhost",
