@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
-
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { OFTAdapterUpgradeable } from "../../contracts/oft/OFTAdapterUpgradeable.sol";
 
-contract OFTAdapterUpgradeableMock is OFTAdapterUpgradeable {
+contract OFTAdapterUpgradeableMock is OFTAdapterUpgradeable, OwnableUpgradeable {
     constructor(address _token, address _lzEndpoint) OFTAdapterUpgradeable(_token, _lzEndpoint) {}
 
     function initialize(address _delegate) external initializer {
         __OFTAdapter_init(_delegate);
         __Ownable_init();
         _transferOwnership(_delegate);
+    }
+
+    function isAuthorizedOperator(address _address) public view virtual override returns (bool) {
+        return _address == owner();
     }
 
     // @dev expose internal functions for testing purposes

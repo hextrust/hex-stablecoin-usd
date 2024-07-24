@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.20;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IOAppOptionsType3, EnforcedOptionParam } from "../interfaces/IOAppOptionsType3.sol";
+import {OAuth} from "../../auth/OAuth.sol";
 
 /**
  * @title OAppOptionsType3
  * @dev Abstract contract implementing the IOAppOptionsType3 interface with type 3 options.
  */
-abstract contract OAppOptionsType3Upgradeable is IOAppOptionsType3, OwnableUpgradeable {
+abstract contract OAppOptionsType3Upgradeable is IOAppOptionsType3, OAuth, Initializable {
     struct OAppOptionsType3Storage {
         // @dev The "msgType" should be defined in the child contract.
         mapping(uint32 => mapping(uint16 => bytes)) enforcedOptions;
@@ -44,13 +45,14 @@ abstract contract OAppOptionsType3Upgradeable is IOAppOptionsType3, OwnableUpgra
      * @dev Sets the enforced options for specific endpoint and message type combinations.
      * @param _enforcedOptions An array of EnforcedOptionParam structures specifying enforced options.
      *
-     * @dev Only the owner/admin of the OApp can call this function.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @dev Provides a way for the OApp to enforce things like paying for PreCrime, AND/OR minimum dst lzReceive gas amounts etc.
      * @dev These enforced options can vary as the potential options/execution on the remote may differ as per the msgType.
      * eg. Amount of lzReceive() gas necessary to deliver a lzCompose() message adds overhead you dont want to pay
      * if you are only making a standard LayerZero message ie. lzReceive() WITHOUT sendCompose().
      */
-    function setEnforcedOptions(EnforcedOptionParam[] calldata _enforcedOptions) public virtual onlyOwner {
+    function setEnforcedOptions(EnforcedOptionParam[] calldata _enforcedOptions) public virtual {
+        _checkAuthorizeOperator();
         OAppOptionsType3Storage storage $ = _getOAppOptionsType3Storage();
         for (uint256 i = 0; i < _enforcedOptions.length; i++) {
             // @dev Enforced options are only available for optionType 3, as type 1 and 2 dont support combining.

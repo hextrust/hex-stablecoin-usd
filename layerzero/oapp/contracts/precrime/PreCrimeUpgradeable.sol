@@ -2,15 +2,16 @@
 
 pragma solidity ^0.8.20;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { BytesLib } from "solidity-bytes-utils/contracts/BytesLib.sol";
 import { ILayerZeroEndpointV2 } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
 import { IPreCrime, PreCrimePeer } from "./interfaces/IPreCrime.sol";
 import { IOAppPreCrimeSimulator } from "./interfaces/IOAppPreCrimeSimulator.sol";
 import { InboundPacket, PacketDecoder } from "./libs/Packet.sol";
+import {OAuth} from "../auth/OAuth.sol";
 
-abstract contract PreCrimeUpgradeable is OwnableUpgradeable, IPreCrime {
+abstract contract PreCrimeUpgradeable is OAuth, Initializable, IPreCrime {
     using BytesLib for bytes;
 
     struct PreCrimeStorage {
@@ -63,12 +64,20 @@ abstract contract PreCrimeUpgradeable is OwnableUpgradeable, IPreCrime {
         return $.maxBatchSize;
     }
 
-    function setMaxBatchSize(uint64 _maxBatchSize) external onlyOwner {
+    /**
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
+     */
+    function setMaxBatchSize(uint64 _maxBatchSize) external {
+        _checkAuthorizeOperator();
         PreCrimeStorage storage $ = _getPreCrimeStorage();
         $.maxBatchSize = _maxBatchSize;
     }
 
-    function setPreCrimePeers(PreCrimePeer[] calldata _preCrimePeers) external onlyOwner {
+    /**
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
+     */
+    function setPreCrimePeers(PreCrimePeer[] calldata _preCrimePeers) external {
+        _checkAuthorizeOperator();
         PreCrimeStorage storage $ = _getPreCrimeStorage();
         delete $.preCrimePeers;
         for (uint256 i = 0; i < _preCrimePeers.length; ++i) {

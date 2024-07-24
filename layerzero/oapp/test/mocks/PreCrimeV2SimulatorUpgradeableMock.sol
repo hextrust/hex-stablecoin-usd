@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import { OAppPreCrimeSimulatorUpgradeable } from "../../contracts/precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
-contract PreCrimeV2SimulatorUpgradeableMock is OAppPreCrimeSimulatorUpgradeable {
+contract PreCrimeV2SimulatorUpgradeableMock is OAppPreCrimeSimulatorUpgradeable, OwnableUpgradeable {
     uint256 public count;
 
     error InvalidEid();
@@ -14,6 +15,10 @@ contract PreCrimeV2SimulatorUpgradeableMock is OAppPreCrimeSimulatorUpgradeable 
     function initialize(address _delegate) external initializer {
         __Ownable_init();
         _transferOwnership(_delegate);
+    }
+
+    function isAuthorizedOperator(address _address) public view virtual override returns (bool) {
+        return _address == owner();
     }
 
     function _lzReceiveSimulate(

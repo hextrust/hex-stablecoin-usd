@@ -47,6 +47,7 @@ abstract contract OFTCoreUpgradeable is
     //  you can only display 1.23 -> uint(123).
     //  @dev To preserve the dust that would otherwise be lost on that conversion,
     //  we need to unify a denomination that can be represented on ALL chains inside of the OFT mesh
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     uint256 public immutable decimalConversionRate;
 
     // @notice Msg types that are used to identify the various OFT operations.
@@ -67,6 +68,7 @@ abstract contract OFTCoreUpgradeable is
      * @dev Constructor.
      * @param _localDecimals The decimals of the token on the local chain (this chain).
      * @param _endpoint The address of the LayerZero endpoint.
+     * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(uint8 _localDecimals, address _endpoint) OAppUpgradeable(_endpoint) {
         if (_localDecimals < sharedDecimals()) revert InvalidLocalDecimals();
@@ -108,12 +110,14 @@ abstract contract OFTCoreUpgradeable is
 
     /**
      * @dev Sets the message inspector address for the OFT.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @param _msgInspector The address of the message inspector.
      *
      * @dev This is an optional contract that can be used to inspect both 'message' and 'options'.
      * @dev Set it to address(0) to disable it, or set it to a contract address to enable it.
      */
-    function setMsgInspector(address _msgInspector) public virtual onlyOwner {
+    function setMsgInspector(address _msgInspector) public virtual {
+        _checkAuthorizeOperator();
         OFTCoreStorage storage $ = _getOFTCoreStorage();
         $.msgInspector = _msgInspector;
         emit MsgInspectorSet(_msgInspector);

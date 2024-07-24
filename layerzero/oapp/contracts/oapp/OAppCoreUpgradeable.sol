@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.20;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { IOAppCore, ILayerZeroEndpointV2 } from "./interfaces/IOAppCore.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {IOAppCore, ILayerZeroEndpointV2} from "./interfaces/IOAppCore.sol";
+import {OAuth} from "../auth/OAuth.sol";
 
 /**
  * @title OAppCore
  * @dev Abstract contract implementing the IOAppCore interface with basic OApp configurations.
  */
-abstract contract OAppCoreUpgradeable is IOAppCore, OwnableUpgradeable {
+abstract contract OAppCoreUpgradeable is IOAppCore, OAuth, Initializable {
     struct OAppCoreStorage {
         mapping(uint32 => bytes32) peers;
     }
@@ -25,11 +26,13 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OwnableUpgradeable {
     }
 
     // The LayerZero endpoint associated with the given OApp
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ILayerZeroEndpointV2 public immutable endpoint;
 
     /**
      * @dev Constructor to initialize the OAppCore with the provided endpoint and delegate.
      * @param _endpoint The address of the LOCAL Layer Zero endpoint.
+     * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address _endpoint) {
         endpoint = ILayerZeroEndpointV2(_endpoint);
@@ -67,12 +70,13 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OwnableUpgradeable {
      * @param _eid The endpoint ID.
      * @param _peer The address of the peer to be associated with the corresponding endpoint.
      *
-     * @dev Only the owner/admin of the OApp can call this function.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.
      * @dev Set this to bytes32(0) to remove the peer address.
      * @dev Peer is a bytes32 to accommodate non-evm chains.
      */
-    function setPeer(uint32 _eid, bytes32 _peer) public virtual onlyOwner {
+    function setPeer(uint32 _eid, bytes32 _peer) public virtual {
+        _checkAuthorizeOperator();
         OAppCoreStorage storage $ = _getOAppCoreStorage();
         $.peers[_eid] = _peer;
         emit PeerSet(_eid, _peer);
@@ -95,10 +99,11 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OwnableUpgradeable {
      * @notice Sets the delegate address for the OApp.
      * @param _delegate The address of the delegate to be set.
      *
-     * @dev Only the owner/admin of the OApp can call this function.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
      * @dev Provides the ability for a delegate to set configs, on behalf of the OApp, directly on the Endpoint contract.
      */
-    function setDelegate(address _delegate) public onlyOwner {
+    function setDelegate(address _delegate) public {
+        _checkAuthorizeOperator();
         endpoint.setDelegate(_delegate);
     }
 }

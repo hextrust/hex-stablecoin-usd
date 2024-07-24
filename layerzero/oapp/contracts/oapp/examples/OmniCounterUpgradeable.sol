@@ -60,8 +60,6 @@ contract OmniCounterUpgradeable is ILayerZeroComposer, OAppUpgradeable, OAppPreC
     constructor(address _endpoint) OAppUpgradeable(_endpoint) {}
 
     function initialize(address _delegate) public initializer {
-        __Ownable_init();
-        _transferOwnership(_delegate);
         __OAppCore_init(_delegate);
 
         admin = msg.sender;
@@ -71,6 +69,10 @@ contract OmniCounterUpgradeable is ILayerZeroComposer, OAppUpgradeable, OAppPreC
     modifier onlyAdmin() {
         require(msg.sender == admin, "only admin");
         _;
+    }
+
+    function isAuthorizedOperator(address _address) public view virtual override returns (bool) {
+        return _address == admin;
     }
 
     // -------------------------------
@@ -240,7 +242,8 @@ contract OmniCounterUpgradeable is ILayerZeroComposer, OAppUpgradeable, OAppPreC
     // this demonstrates how to build an app that requires execution nonce ordering
     // normally an app should decide ordered or not on contract construction
     // this is just a demo
-    function setOrderedNonce(bool _orderedNonce) external onlyOwner {
+    function setOrderedNonce(bool _orderedNonce) external {
+        _checkAuthorizeOperator();
         orderedNonce = _orderedNonce;
     }
 
@@ -265,7 +268,8 @@ contract OmniCounterUpgradeable is ILayerZeroComposer, OAppUpgradeable, OAppPreC
 
     // TODO should override oApp version with added ordered nonce increment
     // a governance function to skip nonce
-    function skipInboundNonce(uint32 _srcEid, bytes32 _sender, uint64 _nonce) public virtual onlyOwner {
+    function skipInboundNonce(uint32 _srcEid, bytes32 _sender, uint64 _nonce) public virtual {
+        _checkAuthorizeOperator();
         endpoint.skip(address(this), _srcEid, _sender, _nonce);
         if (orderedNonce) {
             maxReceivedNonce[_srcEid][_sender]++;

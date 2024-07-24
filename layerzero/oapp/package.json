@@ -8,9 +8,6 @@
     "test": "forge test"
   },
   "dependencies": {
-    "@layerzerolabs/lz-evm-messagelib-v2": "workspace:^",
-    "@layerzerolabs/lz-evm-protocol-v2": "workspace:^",
-    "@layerzerolabs/lz-evm-v1-0.7": "^2.0.1"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "^4.8.1",

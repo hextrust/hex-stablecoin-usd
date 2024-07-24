@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
-
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { PreCrimePeer } from "../../contracts/precrime/interfaces/IPreCrime.sol";
 import { IOAppPreCrimeSimulator } from "../../contracts/precrime/interfaces/IOAppPreCrimeSimulator.sol";
 import { PreCrimeUpgradeable } from "../../contracts/precrime/PreCrimeUpgradeable.sol";
@@ -8,7 +8,7 @@ import { InboundPacket } from "../../contracts/precrime/libs/Packet.sol";
 
 import { PreCrimeV2SimulatorUpgradeableMock } from "./PreCrimeV2SimulatorUpgradeableMock.sol";
 
-contract PreCrimeV2UpgradeableMock is PreCrimeUpgradeable {
+contract PreCrimeV2UpgradeableMock is PreCrimeUpgradeable, OwnableUpgradeable {
     constructor(address _endpoint, address _simulator) PreCrimeUpgradeable(_endpoint, _simulator) {}
 
     uint32[] public eids;
@@ -17,6 +17,10 @@ contract PreCrimeV2UpgradeableMock is PreCrimeUpgradeable {
     function initialize(address _delegate) external initializer {
         __Ownable_init();
         _transferOwnership(_delegate);
+    }
+
+    function isAuthorizedOperator(address _address) public view virtual override returns (bool) {
+        return _address == owner();
     }
 
     function buildSimulationResult() external view override returns (bytes memory) {

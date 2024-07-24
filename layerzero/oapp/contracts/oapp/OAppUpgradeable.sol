@@ -18,6 +18,7 @@ abstract contract OAppUpgradeable is OAppSenderUpgradeable, OAppReceiverUpgradea
     /**
      * @dev Constructor to initialize the OApp with the provided endpoint and owner.
      * @param _endpoint The address of the LOCAL LayerZero endpoint.
+     * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address _endpoint) OAppCoreUpgradeable(_endpoint) {}
 

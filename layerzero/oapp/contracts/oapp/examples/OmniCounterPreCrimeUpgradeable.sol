@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.20;
 
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { PreCrimeUpgradeable, PreCrimePeer } from "../../precrime/PreCrimeUpgradeable.sol";
 import { InboundPacket } from "../../precrime/libs/Packet.sol";
 import { OmniCounterUpgradeable } from "./OmniCounterUpgradeable.sol";
 
-contract OmniCounterPreCrimeUpgradeable is PreCrimeUpgradeable {
+contract OmniCounterPreCrimeUpgradeable is PreCrimeUpgradeable, OwnableUpgradeable {
     struct ChainCount {
         uint32 remoteEid;
         uint256 inboundCount;
@@ -18,6 +19,10 @@ contract OmniCounterPreCrimeUpgradeable is PreCrimeUpgradeable {
     function intialize(address _delegate) external initializer {
         __Ownable_init();
         _transferOwnership(_delegate);
+    }
+
+    function isAuthorizedOperator(address _address) public view virtual override returns (bool) {
+        return _address == owner();
     }
 
     function buildSimulationResult() external view override returns (bytes memory) {
