@@ -4,6 +4,8 @@ pragma solidity ^0.8.18;
 
 import { Test } from "forge-std/Test.sol";
 import { DoubleEndedQueue } from "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import { UlnConfig, SetDefaultUlnConfigParam } from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/UlnBase.sol";
 import { SetDefaultExecutorConfigParam, ExecutorConfig } from "@layerzerolabs/lz-evm-messagelib-v2/contracts/SendLibBase.sol";
@@ -23,7 +25,7 @@ import { ExecutorOptions } from "@layerzerolabs/lz-evm-protocol-v2/contracts/mes
 import { PacketV1Codec } from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol";
 import { Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
-import { OApp } from "../contracts/oapp/OApp.sol";
+import { OAppUpgradeable } from "../contracts/oapp/OAppUpgradeable.sol";
 import { OptionsBuilder } from "../contracts/oapp/libs/OptionsBuilder.sol";
 
 import { OptionsHelper } from "./OptionsHelper.sol";
@@ -52,6 +54,8 @@ contract TestHelper is Test, OptionsHelper {
     uint256 public constant TREASURY_GAS_FOR_FEE_CAP = 100000;
 
     uint128 public executorValueCap = 0.1 ether;
+
+    address public proxyAdmin = makeAddr("proxyAdmin");
 
     function setUp() public virtual {}
 
@@ -235,7 +239,11 @@ contract TestHelper is Test, OptionsHelper {
     ) public returns (address[] memory oapps) {
         oapps = new address[](_oappNum);
         for (uint8 eid = _startEid; eid < _startEid + _oappNum; eid++) {
-            address oapp = _deployOApp(_oappCreationCode, abi.encode(address(endpoints[eid]), address(this), true));
+            address oapp = _deployContractAndProxy(
+                _oappCreationCode,
+                abi.encode(address(endpoints[eid])),
+                abi.encodeWithSignature("initialize(address)", address(this))
+            );
             oapps[eid - _startEid] = oapp;
         }
         // config
@@ -245,17 +253,21 @@ contract TestHelper is Test, OptionsHelper {
     function wireOApps(address[] memory oapps) public {
         uint256 size = oapps.length;
         for (uint256 i = 0; i < size; i++) {
-            OApp localOApp = OApp(payable(oapps[i]));
+            OAppUpgradeable localOApp = OAppUpgradeable(payable(oapps[i]));
             for (uint256 j = 0; j < size; j++) {
                 if (i == j) continue;
-                OApp remoteOApp = OApp(payable(oapps[j]));
+                OAppUpgradeable remoteOApp = OAppUpgradeable(payable(oapps[j]));
                 uint32 remoteEid = (remoteOApp.endpoint()).eid();
                 localOApp.setPeer(remoteEid, addressToBytes32(address(remoteOApp)));
             }
         }
     }
 
-    function _deployOApp(bytes memory _oappBytecode, bytes memory _constructorArgs) internal returns (address addr) {
+    function _deployContractAndProxy(
+        bytes memory _oappBytecode,
+        bytes memory _constructorArgs,
+        bytes memory _initializeArgs
+    ) internal returns (address addr) {
         bytes memory bytecode = bytes.concat(abi.encodePacked(_oappBytecode), _constructorArgs);
         assembly {
             addr := create(0, add(bytecode, 0x20), mload(bytecode))
@@ -263,6 +275,8 @@ contract TestHelper is Test, OptionsHelper {
                 revert(0, 0)
             }
         }
+
+        return address(new TransparentUpgradeableProxy(addr, proxyAdmin, _initializeArgs));
     }
 
     function schedulePacket(bytes calldata _packetBytes, bytes calldata _options) public {

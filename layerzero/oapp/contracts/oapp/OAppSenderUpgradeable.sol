@@ -4,13 +4,13 @@ pragma solidity ^0.8.20;
 
 import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { MessagingParams, MessagingFee, MessagingReceipt } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
-import { OAppCore } from "./OAppCore.sol";
+import { OAppCoreUpgradeable } from "./OAppCoreUpgradeable.sol";
 
 /**
  * @title OAppSender
  * @dev Abstract contract implementing the OAppSender functionality for sending messages to a LayerZero endpoint.
  */
-abstract contract OAppSender is OAppCore {
+abstract contract OAppSenderUpgradeable is OAppCoreUpgradeable {
     using SafeERC20 for IERC20;
 
     // Custom error messages
@@ -20,6 +20,14 @@ abstract contract OAppSender is OAppCore {
     // @dev The version of the OAppSender implementation.
     // @dev Version is bumped when changes are made to this contract.
     uint64 internal constant SENDER_VERSION = 1;
+
+    /**
+     * @dev Ownable is not initialized here on purpose. It should be initialized in the child contract to
+     * accommodate the different version of Ownable.
+     */
+    function __OAppSender_init() internal onlyInitializing {}
+
+    function __OAppSender_init_unchained() internal onlyInitializing {}
 
     /**
      * @notice Retrieves the OApp version information.
@@ -83,8 +91,8 @@ abstract contract OAppSender is OAppCore {
         if (_fee.lzTokenFee > 0) _payLzToken(_fee.lzTokenFee);
 
         return
-            // solhint-disable-next-line check-send-result
             endpoint.send{ value: messageValue }(
+            // solhint-disable-next-line check-send-result
                 MessagingParams(_dstEid, _getPeerOrRevert(_dstEid), _message, _options, _fee.lzTokenFee > 0),
                 _refundAddress
             );

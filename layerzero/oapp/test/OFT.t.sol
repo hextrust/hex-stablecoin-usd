@@ -3,13 +3,13 @@ pragma solidity ^0.8.20;
 
 import { OptionsBuilder } from "../contracts/oapp/libs/OptionsBuilder.sol";
 
-import { OFTMock } from "./mocks/OFTMock.sol";
-import { MessagingFee, MessagingReceipt } from "../contracts/oft/OFTCore.sol";
-import { OFTAdapterMock } from "./mocks/OFTAdapterMock.sol";
+import { OFTUpgradeableMock } from "./mocks/OFTUpgradeableMock.sol";
+import { MessagingFee, MessagingReceipt } from "../contracts/oft/OFTCoreUpgradeable.sol";
+import { OFTAdapterUpgradeableMock } from "./mocks/OFTAdapterUpgradeableMock.sol";
 import { ERC20Mock } from "./mocks/ERC20Mock.sol";
 import { OFTComposerMock } from "./mocks/OFTComposerMock.sol";
 import { OFTInspectorMock, IOAppMsgInspector } from "./mocks/OFTInspectorMock.sol";
-import { IOAppOptionsType3, EnforcedOptionParam } from "../contracts/oapp/libs/OAppOptionsType3.sol";
+import { IOAppOptionsType3, EnforcedOptionParam } from "../contracts/oapp/libs/OAppOptionsType3Upgradeable.sol";
 
 import { OFTMsgCodec } from "../contracts/oft/libs/OFTMsgCodec.sol";
 import { OFTComposeMsgCodec } from "../contracts/oft/libs/OFTComposeMsgCodec.sol";
@@ -18,7 +18,7 @@ import { IOFT, SendParam, OFTReceipt } from "../contracts/oft/interfaces/IOFT.so
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "forge-std/console.sol";
-import { TestHelper } from "./TestHelper.sol";
+import { TestHelper, Initializable } from "./TestHelper.sol";
 
 contract OFTTest is TestHelper {
     using OptionsBuilder for bytes;
@@ -27,9 +27,9 @@ contract OFTTest is TestHelper {
     uint32 bEid = 2;
     uint32 cEid = 3;
 
-    OFTMock aOFT;
-    OFTMock bOFT;
-    OFTAdapterMock cOFTAdapter;
+    OFTUpgradeableMock aOFT;
+    OFTUpgradeableMock bOFT;
+    OFTAdapterUpgradeableMock cOFTAdapter;
     ERC20Mock cERC20Mock;
 
     OFTInspectorMock oAppInspector;
@@ -47,19 +47,28 @@ contract OFTTest is TestHelper {
         super.setUp();
         setUpEndpoints(3, LibraryType.UltraLightNode);
 
-        aOFT = OFTMock(
-            _deployOApp(type(OFTMock).creationCode, abi.encode("aOFT", "aOFT", address(endpoints[aEid]), address(this)))
+        aOFT = OFTUpgradeableMock(
+            _deployContractAndProxy(
+                type(OFTUpgradeableMock).creationCode,
+                abi.encode(address(endpoints[aEid])),
+                abi.encodeWithSelector(OFTUpgradeableMock.initialize.selector, "aOFT", "aOFT", address(this))
+            )
         );
 
-        bOFT = OFTMock(
-            _deployOApp(type(OFTMock).creationCode, abi.encode("bOFT", "bOFT", address(endpoints[bEid]), address(this)))
+        bOFT = OFTUpgradeableMock(
+            _deployContractAndProxy(
+                type(OFTUpgradeableMock).creationCode,
+                abi.encode(address(endpoints[bEid])),
+                abi.encodeWithSelector(OFTUpgradeableMock.initialize.selector, "bOFT", "bOFT", address(this))
+            )
         );
 
         cERC20Mock = new ERC20Mock("cToken", "cToken");
-        cOFTAdapter = OFTAdapterMock(
-            _deployOApp(
-                type(OFTAdapterMock).creationCode,
-                abi.encode(address(cERC20Mock), address(endpoints[cEid]), address(this))
+        cOFTAdapter = OFTAdapterUpgradeableMock(
+            _deployContractAndProxy(
+                type(OFTAdapterUpgradeableMock).creationCode,
+                abi.encode(address(cERC20Mock), address(endpoints[cEid])),
+                abi.encodeWithSelector(OFTAdapterUpgradeableMock.initialize.selector, address(this))
             )
         );
 

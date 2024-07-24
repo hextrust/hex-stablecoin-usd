@@ -2,14 +2,19 @@
 pragma solidity ^0.8.0;
 
 import { Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { OAppPreCrimeSimulator } from "../../contracts/precrime/OAppPreCrimeSimulator.sol";
+import { OAppPreCrimeSimulatorUpgradeable } from "../../contracts/precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
-contract PreCrimeV2SimulatorMock is OAppPreCrimeSimulator {
+contract PreCrimeV2SimulatorUpgradeableMock is OAppPreCrimeSimulatorUpgradeable {
     uint256 public count;
 
     error InvalidEid();
+
+    function initialize(address _delegate) external initializer {
+        __Ownable_init();
+        _transferOwnership(_delegate);
+    }
 
     function _lzReceiveSimulate(
         Origin calldata _origin,

@@ -5,9 +5,9 @@ pragma solidity ^0.8.20;
 import { ILayerZeroEndpointV2, MessagingFee, MessagingReceipt, Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 import { ILayerZeroComposer } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroComposer.sol";
 
-import { OApp } from "../OApp.sol";
+import { OAppUpgradeable } from "../OAppUpgradeable.sol";
 import { OptionsBuilder } from "../libs/OptionsBuilder.sol";
-import { OAppPreCrimeSimulator } from "../../precrime/OAppPreCrimeSimulator.sol";
+import { OAppPreCrimeSimulatorUpgradeable } from "../../precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
 library MsgCodec {
     uint8 internal constant VANILLA_TYPE = 1;
@@ -40,7 +40,7 @@ library MsgCodec {
     }
 }
 
-contract OmniCounter is ILayerZeroComposer, OApp, OAppPreCrimeSimulator {
+contract OmniCounterUpgradeable is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulatorUpgradeable {
     using MsgCodec for bytes;
     using OptionsBuilder for bytes;
 
@@ -57,9 +57,15 @@ contract OmniCounter is ILayerZeroComposer, OApp, OAppPreCrimeSimulator {
     mapping(uint32 srcEid => uint256 count) public inboundCount;
     mapping(uint32 dstEid => uint256 count) public outboundCount;
 
-    constructor(address _endpoint, address _delegate) OApp(_endpoint, _delegate) {
+    constructor(address _endpoint) OAppUpgradeable(_endpoint) {}
+
+    function initialize(address _delegate) public initializer {
+        __Ownable_init();
+        _transferOwnership(_delegate);
+        __OAppCore_init(_delegate);
+
         admin = msg.sender;
-        eid = ILayerZeroEndpointV2(_endpoint).eid();
+        eid = ILayerZeroEndpointV2(endpoint).eid();
     }
 
     modifier onlyAdmin() {
@@ -200,8 +206,8 @@ contract OmniCounter is ILayerZeroComposer, OApp, OAppPreCrimeSimulator {
 
     function lzCompose(
         address _oApp,
-        bytes32 /*_guid*/,
-        bytes calldata _message,
+        bytes32,
+        /*_guid*/ bytes calldata _message,
         address,
         bytes calldata
     ) external payable override {
@@ -267,7 +273,7 @@ contract OmniCounter is ILayerZeroComposer, OApp, OAppPreCrimeSimulator {
     }
 
     function isPeer(uint32 _eid, bytes32 _peer) public view override returns (bool) {
-        return peers[_eid] == _peer;
+        return peers(_eid) == _peer;
     }
 
     // @dev Batch send requires overriding this function from OAppSender because the msg.value contains multiple fees

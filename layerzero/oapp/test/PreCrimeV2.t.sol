@@ -8,8 +8,8 @@ import { IPreCrime, PreCrimePeer } from "../contracts/precrime/interfaces/IPreCr
 import { InboundPacket } from "../contracts/precrime/libs/Packet.sol";
 
 import { TestHelper } from "./TestHelper.sol";
-import { PreCrimeV2Mock } from "./mocks/PreCrimeV2Mock.sol";
-import { PreCrimeV2SimulatorMock } from "./mocks/PreCrimeV2SimulatorMock.sol";
+import { PreCrimeV2UpgradeableMock } from "./mocks/PreCrimeV2UpgradeableMock.sol";
+import { PreCrimeV2SimulatorUpgradeableMock } from "./mocks/PreCrimeV2SimulatorUpgradeableMock.sol";
 
 import "forge-std/console.sol";
 
@@ -18,8 +18,8 @@ contract PreCrimeV2Test is TestHelper {
     uint64 constant MAX_BATCH_SIZE = 4;
     address constant OFF_CHAIN = address(0xDEAD);
 
-    PreCrimeV2Mock preCrime;
-    PreCrimeV2SimulatorMock simulator;
+    PreCrimeV2UpgradeableMock preCrime;
+    PreCrimeV2SimulatorUpgradeableMock simulator;
 
     PreCrimePeer[] preCrimePeers;
 
@@ -28,8 +28,20 @@ contract PreCrimeV2Test is TestHelper {
 
         setUpEndpoints(1, LibraryType.SimpleMessageLib);
 
-        simulator = new PreCrimeV2SimulatorMock();
-        preCrime = new PreCrimeV2Mock(address(endpoints[1]), address(simulator));
+        simulator = PreCrimeV2SimulatorUpgradeableMock(
+            _deployContractAndProxy(
+                type(PreCrimeV2SimulatorUpgradeableMock).creationCode,
+                new bytes(0),
+                abi.encodeWithSelector(PreCrimeV2SimulatorUpgradeableMock.initialize.selector, address(this))
+            )
+        );
+        preCrime = PreCrimeV2UpgradeableMock(
+            _deployContractAndProxy(
+                type(PreCrimeV2UpgradeableMock).creationCode,
+                abi.encode(address(endpoints[1]), address(simulator)),
+                abi.encodeWithSelector(PreCrimeV2UpgradeableMock.initialize.selector, address(this))
+            )
+        );
 
         preCrimePeers.push(PreCrimePeer(2, bytes32(uint256(22)), bytes32(uint256(2))));
         preCrimePeers.push(PreCrimePeer(3, bytes32(uint256(33)), bytes32(uint256(3))));
@@ -90,7 +102,7 @@ contract PreCrimeV2Test is TestHelper {
         vm.startPrank(OFF_CHAIN);
         bytes memory expectedError = abi.encodeWithSelector(
             IPreCrime.SimulationFailed.selector,
-            abi.encodeWithSelector(PreCrimeV2SimulatorMock.InvalidEid.selector)
+            abi.encodeWithSelector(PreCrimeV2SimulatorUpgradeableMock.InvalidEid.selector)
         );
         vm.expectRevert(expectedError);
         preCrime.simulate(packets, packetMsgValues);

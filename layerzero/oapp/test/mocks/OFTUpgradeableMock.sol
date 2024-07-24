@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import { OFT } from "../../contracts/oft/OFT.sol";
-import { SendParam } from "../../contracts/oft/OFTCore.sol";
+import { OFTUpgradeable } from "../../contracts/oft/OFTUpgradeable.sol";
+import { SendParam } from "../../contracts/oft/OFTCoreUpgradeable.sol";
 
-contract OFTMock is OFT {
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _lzEndpoint,
-        address _delegate
-    ) OFT(_name, _symbol, _lzEndpoint, _delegate) {}
+contract OFTUpgradeableMock is OFTUpgradeable {
+    constructor(address _lzEndpoint) OFTUpgradeable(_lzEndpoint) {}
+
+    function initialize(string memory _name, string memory _symbol, address _delegate) external initializer {
+        __OFT_init(_name, _symbol, _delegate);
+        __Ownable_init();
+        _transferOwnership(_delegate);
+    }
 
     function mint(address _to, uint256 _amount) public {
         _mint(_to, _amount);

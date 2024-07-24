@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.20;
 
-import { MessagingReceipt, MessagingFee } from "../../oapp/OAppSender.sol";
+import { MessagingReceipt, MessagingFee } from "../../oapp/OAppSenderUpgradeable.sol";
 
 /**
  * @dev Struct representing token parameters for the OFT send() operation.
@@ -57,17 +57,26 @@ interface IOFT {
 
     // Events
     event OFTSent(
-        bytes32 indexed guid, // GUID of the OFT message.
-        uint32 dstEid, // Destination Endpoint ID.
-        address indexed fromAddress, // Address of the sender on the src chain.
-        uint256 amountSentLD, // Amount of tokens sent in local decimals.
-        uint256 amountReceivedLD // Amount of tokens received in local decimals.
+        // GUID of the OFT message.
+        // Destination Endpoint ID.
+        // Address of the sender on the src chain.
+        // Amount of tokens sent in local decimals.
+        // Amount of tokens received in local decimals.
+        bytes32 indexed guid,
+        uint32 dstEid,
+        address indexed fromAddress,
+        uint256 amountSentLD,
+        uint256 amountReceivedLD
     );
     event OFTReceived(
-        bytes32 indexed guid, // GUID of the OFT message.
-        uint32 srcEid, // Source Endpoint ID.
-        address indexed toAddress, // Address of the recipient on the dst chain.
-        uint256 amountReceivedLD // Amount of tokens received in local decimals.
+        // GUID of the OFT message.
+        // Source Endpoint ID.
+        // Address of the recipient on the dst chain.
+        // Amount of tokens received in local decimals.
+        bytes32 indexed guid,
+        uint32 srcEid,
+        address indexed toAddress,
+        uint256 amountReceivedLD
     );
 
     /**

@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import { OFTAdapter } from "../../contracts/oft/OFTAdapter.sol";
+import { OFTAdapterUpgradeable } from "../../contracts/oft/OFTAdapterUpgradeable.sol";
 
-contract OFTAdapterMock is OFTAdapter {
-    constructor(address _token, address _lzEndpoint, address _delegate) OFTAdapter(_token, _lzEndpoint, _delegate) {}
+contract OFTAdapterUpgradeableMock is OFTAdapterUpgradeable {
+    constructor(address _token, address _lzEndpoint) OFTAdapterUpgradeable(_token, _lzEndpoint) {}
+
+    function initialize(address _delegate) external initializer {
+        __OFTAdapter_init(_delegate);
+        __Ownable_init();
+        _transferOwnership(_delegate);
+    }
 
     // @dev expose internal functions for testing purposes
     function debit(
