@@ -3,7 +3,7 @@
 pragma solidity ^0.8.20;
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {IOAppCore, ILayerZeroEndpointV2} from "./interfaces/IOAppCore.sol";
+import {IOAppCore, ILayerZeroEndpoint} from "./interfaces/IOAppCore.sol";
 import {OAuth} from "../auth/OAuth.sol";
 
 /**
@@ -27,7 +27,7 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OAuth, Initializable {
 
     // The LayerZero endpoint associated with the given OApp
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    ILayerZeroEndpointV2 public immutable endpoint;
+    ILayerZeroEndpoint public immutable endpoint;
 
     /**
      * @dev Constructor to initialize the OAppCore with the provided endpoint and delegate.
@@ -35,7 +35,7 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OAuth, Initializable {
      * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address _endpoint) {
-        endpoint = ILayerZeroEndpointV2(_endpoint);
+        endpoint = ILayerZeroEndpoint(_endpoint);
     }
 
     /**
@@ -51,8 +51,33 @@ abstract contract OAppCoreUpgradeable is IOAppCore, OAuth, Initializable {
     }
 
     function __OAppCore_init_unchained(address _delegate) internal onlyInitializing {
+        _setEndpointDelegate(_delegate);
+    }
+
+    /**
+     * @dev Expected to be done in initializer
+     * @dev Update the OAppCore with the provided delegate.
+     * @dev The delegate typically should be set as the owner of the contract.
+     * @dev Only the admin of the OApp can call this function. control via {_checkAuthorizeOperator()}
+     * @param _delegate The delegate capable of making OApp configurations inside of the endpoint.
+     */
+    function setEndpointDelegate(address _delegate) external {
+        _checkAuthorizeOperator();
+        _setEndpointDelegate(_delegate);
+    }
+
+    function _setEndpointDelegate(address _delegate) internal {
         if (_delegate == address(0)) revert InvalidDelegate();
+        if (_delegate == endpointDelegate()) revert IdenticalDelegate();
         endpoint.setDelegate(_delegate);
+    }
+
+    /**
+     * @notice Returns the peer address (OApp instance) associated with a specific endpoint.
+     * @return The address of the delegate if this OAppCore at endpoint which set via {setEndpointDelegate}
+     */
+    function endpointDelegate() public view returns (address) {
+        return endpoint.delegates(address(this));
     }
 
     /**

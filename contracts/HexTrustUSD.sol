@@ -49,6 +49,7 @@ contract HexTrustUSD is UUPSUpgradeable, ERC20WithRolesUpgradeable {
         address newImplementation
     )
         internal
+        virtual
         override
         onlyRole(RoleConstant.UPGRADE_ADMIN_ROLE)
         whenNotPaused

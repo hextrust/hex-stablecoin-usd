@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.20;
 
-import { ILayerZeroEndpointV2 } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
+import { ILayerZeroEndpoint } from "./ILayerZeroEndpoint.sol";
 
 /**
  * @title IOAppCore
@@ -13,6 +13,7 @@ interface IOAppCore {
     error NoPeer(uint32 eid);
     error InvalidEndpointCall();
     error InvalidDelegate();
+    error IdenticalDelegate();
 
     // Event emitted when a peer (OApp) is set for a corresponding endpoint
     event PeerSet(uint32 eid, bytes32 peer);
@@ -28,7 +29,7 @@ interface IOAppCore {
      * @notice Retrieves the LayerZero endpoint associated with the OApp.
      * @return iEndpoint The LayerZero endpoint as an interface.
      */
-    function endpoint() external view returns (ILayerZeroEndpointV2 iEndpoint);
+    function endpoint() external view returns (ILayerZeroEndpoint iEndpoint);
 
     /**
      * @notice Retrieves the peer (OApp) associated with a corresponding endpoint.

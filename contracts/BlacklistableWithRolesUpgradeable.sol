@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {AccessControlDefaultAdminRulesUpgradeable} from "contracts/AccessControlDefaultAdminRulesUpgradeable.sol";
-import {Context} from "contracts/utils/Context.sol";
+import {PausableWithRolesUpgradeable} from "contracts/PausableWithRolesUpgradeable.sol";
 import {RoleConstant} from "contracts/utils/RoleConstant.sol";
 
 /**
@@ -11,8 +10,7 @@ import {RoleConstant} from "contracts/utils/RoleConstant.sol";
  */
 
 abstract contract BlacklistableWithRolesUpgradeable is
-    Context,
-    AccessControlDefaultAdminRulesUpgradeable
+    PausableWithRolesUpgradeable
 {
     /// @custom:storage-location erc7201:BlacklistableStorage
     struct BlacklistableStorage {

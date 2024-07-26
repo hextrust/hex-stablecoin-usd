@@ -13,7 +13,6 @@ import {RoleConstant} from "contracts/utils/RoleConstant.sol";
 
 abstract contract ERC20WithRolesUpgradeable is
     ERC20Upgradeable,
-    PausableWithRolesUpgradeable,
     BlacklistableWithRolesUpgradeable
 {
     /// @custom:storage-location erc7201:ERC20PermitWithRolesStorage

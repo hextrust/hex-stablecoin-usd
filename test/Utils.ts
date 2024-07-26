@@ -34,12 +34,11 @@ export async function deployContractAndUpgradeToV2() {
     const endpoint = await LZEndpointV2Mock.deploy(eid, deployer.address);
     const HexTrustUSDV2Contract = await ethers.getContractFactory(`HexTrustUSDV2`, deployer);
     const decimals = await proxy.decimals();
-    const delegate = await proxy.defaultAdmin();
     const proxyV2 = await upgrades.upgradeProxy(proxy.address, HexTrustUSDV2Contract, {
         constructorArgs: [decimals, endpoint.address],
         call: {
             fn: 'initializeV2',
-            args: [delegate],
+            args: [],
         },
     });
     await proxy.revokeRole(UPGRADE_ADMIN_ROLE, deployer.address);
