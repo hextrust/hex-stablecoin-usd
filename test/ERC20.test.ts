@@ -270,7 +270,7 @@ describe('ERC20Test', function () {
         });
     });
 
-    describe('Burn Black Funds', function () {
+    describe('burnBlackFunds', function () {
         let blacklistedUserBalance: BigNumber;
         beforeEach(async function () {
             blacklistedUserBalance = utils.parseUnits('5000', decimals);
@@ -279,23 +279,23 @@ describe('ERC20Test', function () {
             await contract.connect(blacklistRoleUser).addBlacklist(blacklistedUser.address);
         });
 
-        it('should burn all balance of blacklisted user when caller has BLACKLISTER_ROLE', async function () {
+        it('should burn all balance of blacklisted user when caller has BURNER_ROLE', async function () {
             expect(await contract.balanceOf(blacklistedUser.address)).to.equal(blacklistedUserBalance);
-            await contract.connect(blacklistRoleUser).burnBlackFunds(blacklistedUser.address);
+            await contract.connect(burnerRoleUser).burnBlackFunds(blacklistedUser.address);
             expect(await contract.balanceOf(blacklistedUser.address)).to.equal(Zero);
         });
 
-        it('should revert when input a non-blacklisted account when caller has BLACKLISTER_ROLE', async function () {
-            await expect(contract.connect(blacklistRoleUser).burnBlackFunds(user.address))
+        it('should revert when input a non-blacklisted account when caller has BURNER_ROLE', async function () {
+            await expect(contract.connect(burnerRoleUser).burnBlackFunds(user.address))
                 .to.be.revertedWithCustomError(contract, 'NotBlacklisted')
                 .withArgs(user.address);
         });
 
-        it('should revert when input a blacklisted account when caller do not have BLACKLISTER_ROLE', async function () {
-            for (const caller of [deployer, user, minerRoleUser, burnerRoleUser]) {
+        it('should revert when input a blacklisted account when caller do not have BURNER_ROLE', async function () {
+            for (const caller of [deployer, user, minerRoleUser, blacklistRoleUser]) {
                 await expect(contract.connect(caller).burnBlackFunds(blacklistedUser.address))
                     .to.be.revertedWithCustomError(contract, 'AccessControlUnauthorizedAccount')
-                    .withArgs(caller.address, BLACKLISTER_ROLE);
+                    .withArgs(caller.address, BURNER_ROLE);
             }
         });
     });
