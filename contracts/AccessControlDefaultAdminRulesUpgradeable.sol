@@ -76,7 +76,7 @@ abstract contract AccessControlDefaultAdminRulesUpgradeable is
      * @dev Throws if called by any account other than the _currentDefaultAdmin.
      */
     modifier onlyDefaultAdmin() {
-        require(isDefaultAdmin(_msgSender()), "AccessControl: caller is not the default admin");
+        if (!isDefaultAdmin(_msgSender())) revert AccessControlNonDefaultAdmin();
         _;
     }
 

@@ -13,7 +13,6 @@ import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol"
  * 5. Remove acceptSchedule from pendingDefaultAdmin function
  * 6. Remove defaultAdminDelay/pendingDefaultAdminDelay/changeDefaultAdminDelay/rollbackDefaultAdminDelay/defaultAdminDelayIncreaseWait function
  */
-
 interface IAccessControlDefaultAdminRules is IAccessControl {
     /**
      * @dev The new default admin is not a valid default admin.
@@ -28,6 +27,14 @@ interface IAccessControlDefaultAdminRules is IAccessControl {
      * - Any `DEFAULT_ADMIN_ROLE` transfer must be in two delayed steps.
      */
     error AccessControlEnforcedDefaultAdminRules();
+    /**
+     * @dev Message Sender is not
+     *
+     * - The `DEFAULT_ADMIN_ROLE` must only be managed by itself.
+     * - The `DEFAULT_ADMIN_ROLE` must only be held by one account at the time.
+     * - Any `DEFAULT_ADMIN_ROLE` transfer must be in two delayed steps.
+     */
+    error AccessControlNonDefaultAdmin();
 
     /**
      * @dev Emitted when a {defaultAdmin} transfer is started, setting `newAdmin` as the next

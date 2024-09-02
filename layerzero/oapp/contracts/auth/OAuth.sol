@@ -3,13 +3,15 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title OAuthUpgradeable
+ * @title OAuth
  * @dev Abstract contract implementing the IOAuth interface which perform access right for configurations updates.
  */
 abstract contract OAuth {
+    error NonAuthorizeOperator();
     /**
      * @dev Returns true for authorized operator who has access right to update OApp configurations
      */
+
     function isAuthorizedOperator(address _address) public view virtual returns (bool);
 
     /**
@@ -18,6 +20,6 @@ abstract contract OAuth {
      *
      */
     function _checkAuthorizeOperator() internal view virtual {
-        require(isAuthorizedOperator(msg.sender), "OAuth: caller is not the authorized operator");
+        if (!isAuthorizedOperator(msg.sender)) revert NonAuthorizeOperator();
     }
 }

@@ -128,7 +128,7 @@ describe('HexTrustUSDV2', function () {
         });
     });
 
-    describe('isAuthorizedOperator', function () {
+    describe('isAuthorizedOperator & setEndpointDelegate', function () {
         it('should return false for nonDefaultAdmin & without UPGRADE_ADMIN_ROLE', async function () {
             expect(await proxy.isAuthorizedOperator(user1.address)).to.be.false;
         });
@@ -141,6 +141,12 @@ describe('HexTrustUSDV2', function () {
             expect(await proxy.defaultAdmin()).to.equals(owner1.address);
             expect(await proxy.isAuthorizedOperator(deployer.address)).to.be.false;
             expect(await proxy.isAuthorizedOperator(owner1.address)).to.be.true;
+            await expect(proxy.connect(deployer).setEndpointDelegate(deployer.address)).to.be.revertedWithCustomError(proxy, 'NonAuthorizeOperator');
+            await expect(proxy.connect(deployer).setEndpointDelegate(owner1.address)).to.be.revertedWithCustomError(proxy, 'NonAuthorizeOperator');
+            expect(await proxy.endpointDelegate()).to.be.equals(deployer.address);
+            await proxy.connect(owner1).setEndpointDelegate(owner1.address);
+            await expect(proxy.connect(owner1).setEndpointDelegate(owner1.address));
+            expect(await proxy.endpointDelegate()).to.be.equals(owner1.address);
         });
         it('should return true for user with UPGRADE_ADMIN_ROLE', async function () {
             expect(await proxy.isAuthorizedOperator(upgradeAdminRoleUser.address)).to.be.true;
@@ -171,5 +177,4 @@ describe('HexTrustUSDV2', function () {
             expect(await proxy.sharedDecimals()).to.equals(await proxy.decimals());
         });
     });
-
 });
