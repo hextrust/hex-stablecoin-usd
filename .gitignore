@@ -1,20 +1,21 @@
 # compiled output
-/node_modules
-/cache
+**/node_modules/
+**/cache/
+**/out/
 /artifacts
 /typechain-types
 /contracts-exposed
 /coverage
+coverage.json
 
 # IDE - VSCode
+.vscode
 .vscode/*
+.openzeppelin
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# Readme file
-README.md
 
 .DS_Store
 **/.DS_Store

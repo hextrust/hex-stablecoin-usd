@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
 import {IAccessControlDefaultAdminRules} from "./interface/IAccessControlDefaultAdminRules.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
@@ -70,6 +70,31 @@ abstract contract AccessControlDefaultAdminRulesUpgradeable is
             revert AccessControlInvalidDefaultAdmin(address(0));
         }
         _grantRole(DEFAULT_ADMIN_ROLE, initialDefaultAdmin);
+    }
+
+    /**
+     * @dev Throws if called by any account other than the _currentDefaultAdmin.
+     */
+    modifier onlyDefaultAdmin() {
+        if (!isDefaultAdmin(_msgSender())) revert AccessControlNonDefaultAdmin();
+        _;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the _currentDefaultAdmin or with given role
+     */
+    modifier onlyRoleOrDefaultAdmin(bytes32 role) {
+        if (!isDefaultAdmin(_msgSender())) {
+            _checkRole(role);
+        }
+        _;
+    }
+
+    /**
+     * @dev check if input address equals _currentDefaultAdmin
+     */
+    function isDefaultAdmin(address _address) public view virtual returns (bool) {
+        return defaultAdmin() == _address;
     }
 
     /**

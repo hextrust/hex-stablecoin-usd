@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "clear": "rm -rf cache contracts-exposed artifacts typechain-types node_modules coverage",
     "deploy": "npx hardhat run scripts/deploy.ts --network localhost",
     "query": "npx hardhat run scripts/query.ts --network localhost",
     "upgrade": "npx hardhat run scripts/upgrade.ts --network localhost",
@@ -12,6 +13,8 @@
     "coverage": "yarn hardhat coverage"
   },
   "dependencies": {
+    "@layerzerolabs/lz-evm-messagelib-v2": "^2.3.25",
+    "@layerzerolabs/lz-evm-protocol-v2": "^2.3.25",
     "@openzeppelin/contracts-upgradeable": "^5.0.0",
     "@openzeppelin/hardhat-upgrades": "^1.24.0",
     "@openzeppelin/test-helpers": "^0.5.16",

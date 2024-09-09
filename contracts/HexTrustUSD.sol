@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -49,6 +49,7 @@ contract HexTrustUSD is UUPSUpgradeable, ERC20WithRolesUpgradeable {
         address newImplementation
     )
         internal
+        virtual
         override
         onlyRole(RoleConstant.UPGRADE_ADMIN_ROLE)
         whenNotPaused
