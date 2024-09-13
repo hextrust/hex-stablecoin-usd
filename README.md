@@ -19,7 +19,7 @@ The contract was audited by third party provide, Hacken in December 2023. Audit 
 |  Version |              Audit report                  |          |
 |:---------|:------------------------------------------:|:----------|
 |     1    | [Hacken December 2023](./audit/Hex_Trust_SC_Audit_24_11_23_[SA2049]_final.pdf) |     ERC20 basic function with blacklisting , pausing & UUPS proxies upgrading features    |
-|     2    |    |     Supporting LayerZero OFT standard    |
+|     2    | [Halborn August 2024](./audit/HexTrustUSDv2_Audit_29Aug2024.pdf)   |     Supporting LayerZero OFT standard    |
 
 ### Setup 
 
