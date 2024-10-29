@@ -2,15 +2,16 @@
 # Hex Stablecoin (USDX)
 
 USDX is ERC-20 token that is issued by HTMI Limited and is backed by USD reserve managed by trusted custodian.
-See contract functionalities details from Docs [here](./doc/token_design.md)
+See contract functionalities details from Docs 
+- [Token Design](./doc/token_design.md)
 
 ### Deployed Contract Addresses
 
-|        Chain       |                  Address                   |  Version  |
-|:-------------------|:------------------------------------------:|:----------|
-| Ethereum Mainnet   | 0x7A486F809c952a6f8dEc8cb0Ff68173F2B8ED56c |     2     |
-| Flare Mainnet      | 0x4A771Cc1a39FDd8AA08B8EA51F7Fd412e73B3d2B |     2     |
-| Songbird Mainnet   | 0x4A771Cc1a39FDd8AA08B8EA51F7Fd412e73B3d2B |     1     |
+|        Chain       |                  Address                   |  Version  |  Decimals |
+|:-------------------|:------------------------------------------:|:----------|:----------|
+| Ethereum Mainnet   | 0xf8750b54d86BE7aE9e32b4A0C826811198D63313 |     2     |     18    |
+| Flare Mainnet      | 0x4A771Cc1a39FDd8AA08B8EA51F7Fd412e73B3d2B |     2     |     6     |
+| Songbird Mainnet   | 0x4A771Cc1a39FDd8AA08B8EA51F7Fd412e73B3d2B |     1     |     6     |
 
 ### Audit & Version
 

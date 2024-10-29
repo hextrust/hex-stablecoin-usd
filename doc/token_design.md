@@ -50,3 +50,8 @@ Functions to pause and unpause transfer in the event of emergency. Inherited fro
 ## Upgradability
 
 Upgradable mechanism is based on UUPS proxies pattern. The \_authorizeUpgrade function is overridden to include access restriction to the upgrade mechanism allowed only by `UPGRADE_ADMIN_ROLE` and defaultAdmin
+
+## LayerZero OFT Bridging Support
+
+USDX support LayerZero OFT standard which allows user bridging USDX among Ethereum Mainnet & Flare Mainnet.
+Checkout via [LayerZero OFT](https://docs.layerzero.network/v2/developers/evm/oft/quickstart) & [Stargate Finance](https://stargate.finance/bridge)
